@@ -41,7 +41,7 @@ namespace Kiwi
 
     class KiwiGame
     {
-        int test = 0;
+        int test = 2;
         public const int playFieldWidth = 90;
         const int kiwiStartPositionX = 45;
         const int kiwiStartPositionY = 0;
