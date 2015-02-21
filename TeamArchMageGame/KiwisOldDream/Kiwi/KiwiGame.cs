@@ -193,7 +193,7 @@ namespace Kiwi
                 }
                 PrintInfo(lifes, speed, pulse, ConsoleColor.Blue);
 
-                Thread.Sleep(100);//Slow down program
+                Thread.Sleep(200);//Slow down program
                 
             }
 

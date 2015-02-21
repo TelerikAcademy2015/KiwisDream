@@ -1,24 +1,6 @@
-                                                      .```.      _ _
-                                                     ;     ````'     '=
-                                                     :  @               `.
-                                                     / >,:                \
-                                                    /.'   `'.,             :
-                                                   /'         ;.   .       ;
-                                                  /          ;  \ ;     ; /
-                                                             `..;\:     :'
-                                                            __||   `...,'
-                                                           `-,  )   ||
-                                                            /.^/ ___||
-                                                                '---,_\
-                                                                   (/ `\
-
-              GGG        AA          MM   MM    EEEEEEE      K    K   O  V       VV       V O    @	 
-             G          A  A        M  M M  M   E            K   K    O  V       VV       V O    @	 
-             G         A    A      M    M    M  E            KKKK     O   V     V  V     V  O    @	 
-             G  GGG   AAAAAAAA    M     M     M EEEEEE       K   K    O    V   V    V   V   O    @	 
-             G    G  A        A   M           M E            K    K   O     V V      V V    O    	 
-              GGGG  A          A  M           M EEEEEEE      K     K  O      V        V     O    @  
-
-
-			                       PRESS [ENTER] TO START THE GAME!
-								   
+              GGG        AA          MM   MM    EEEEEEE        OOOOO   V       V   EEEEEEE   RRRRR    @
+             G          A  A        M  M M  M   E              O   O   V       V   E         R    R   @
+             G         A    A      M    M    M  E              O   O    V     V    E         RRRRR    @
+             G  GGG   AAAAAAAA    M     M     M EEEEEE         O   O     V   V     EEEEEE    R R      @
+             G    G  A        A   M           M E              O   O      V V      E         R   R    
+              GGGG  A          A  M           M EEEEEEE        OOOOO       V       EEEEEEE   R    R   @
