@@ -12,6 +12,7 @@ namespace Main
         const double maxSpeed = 300;
         const int maxPulse = 255;
         static string gameBeginning = System.IO.File.ReadAllText("../../../GameBeginningFile.txt");
+        static string gameOver = System.IO.File.ReadAllText("../../../GameOverFile.txt");
         struct Stuff
         {
             public int x;
