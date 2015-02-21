@@ -55,7 +55,7 @@ namespace Kiwi
         static string gameOver = System.IO.File.ReadAllText("../../TextFile1.txt");
         static string gameBeginning = System.IO.File.ReadAllText("../../TextFile2.txt");
 
-        static void Main(string[] args)
+        static void Main()
         {
             Console.BufferHeight = Console.WindowHeight = 40;
             Console.BufferWidth = Console.WindowWidth = 120;
@@ -153,7 +153,7 @@ namespace Kiwi
                     }
                 }
 
-               
+                Console.Clear();//Cleans the console.
 
                 PrintOnPosition(myKiwi.x, myKiwi.y, myKiwi.shape, myKiwi.color);//Redraw  playfield
                 foreach (var tree in trees)//Redraw  playfield
@@ -194,7 +194,7 @@ namespace Kiwi
                 PrintInfo(lifes, speed, pulse, ConsoleColor.Blue);
 
                 Thread.Sleep(100);//Slow down program
-                Console.Clear();//Cleans the console.
+                
             }
 
         }
