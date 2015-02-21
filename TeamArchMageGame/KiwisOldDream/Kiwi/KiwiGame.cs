@@ -40,13 +40,13 @@ namespace Kiwi
     }
 
     class KiwiGame
-    {   
+    {
         public const int playFieldWidth = 90;
         const int kiwiStartPositionX = 45;
         const int kiwiStartPositionY = 0;
         static double speed = 20;
         const double maxSpeed = 200;
-        static double pulse = 100;
+        static double pulse = 60;
         const int maxPulse = 250;
         static int lifes = 5;
         const int maxLifes = 5;
@@ -55,7 +55,7 @@ namespace Kiwi
         static string gameOver = System.IO.File.ReadAllText("../../TextFile1.txt");
         static string gameBeginning = System.IO.File.ReadAllText("../../TextFile2.txt");
 
-        static void Main(string[] args)
+        static void Main()
         {
             Console.BufferHeight = Console.WindowHeight = 40;
             Console.BufferWidth = Console.WindowWidth = 120;
@@ -72,7 +72,7 @@ namespace Kiwi
                 Console.Clear();
                 Console.SetCursorPosition(30, 20);
                 Console.WriteLine("READY!!!");
-                Thread.Sleep(400);
+                Thread.Sleep(150);
             }
             else
             {
@@ -82,12 +82,27 @@ namespace Kiwi
             }
             while (true)
             {
-                Tree pineTree = new Tree(rand.Next(0, playFieldWidth), Console.WindowHeight - 1, "pine", ConsoleColor.DarkRed);
-                Tree limeTree = new Tree(rand.Next(0, playFieldWidth), Console.WindowHeight - 1, "lime", ConsoleColor.Green);
-                Tree coconutTree = new Tree(rand.Next(0, playFieldWidth), Console.WindowHeight - 1, "coconut", ConsoleColor.White);
+                // Generate spawning chance 
+                Random randomGenerator = new Random();
+                int chance = randomGenerator.Next(0, 101);
+                if (chance == 0 && chance <=20)
+                {
+                    // Spawn nothing
+                }
+                else if (chance >= 21 && chance <= 40)
+                {
+                    Tree pineTree = new Tree(rand.Next(0, playFieldWidth), Console.WindowHeight - 1, "pine", ConsoleColor.DarkRed);
+                    Tree limeTree = new Tree(rand.Next(0, playFieldWidth), Console.WindowHeight - 1, "lime", ConsoleColor.Green);
+                    Tree coconutTree = new Tree(rand.Next(0, playFieldWidth), Console.WindowHeight - 1, "coconut", ConsoleColor.White);
 
-                Tree[] treeTypes = new Tree[] { pineTree, limeTree, coconutTree };
-                trees.Add(treeTypes[rand.Next(0, treeTypes.Length)]);
+                    Tree[] treeTypes = new Tree[] { pineTree, limeTree, coconutTree };
+                    trees.Add(treeTypes[rand.Next(0, treeTypes.Length)]);
+
+                }
+
+                
+
+                
 
                 if (Console.KeyAvailable)//checks if there is pressed button in the console.
                 {
@@ -116,7 +131,7 @@ namespace Kiwi
                     }
                 }
 
-                Thread.Sleep(100);//Slow down program
+                
 
                 for (int i = 0; i < trees.Count; i++)
                 {
@@ -146,7 +161,7 @@ namespace Kiwi
                     PrintOnPosition(tree.x, tree.y, tree.shape, tree.color);
                 }
 
-                if (speed >= 50)
+                if (speed == maxSpeed)
                 {
                     pulse += 1;
                 }
@@ -177,6 +192,9 @@ namespace Kiwi
                     break;
                 }
                 PrintInfo(lifes, speed, pulse, ConsoleColor.Blue);
+
+                Thread.Sleep(100);//Slow down program
+                
             }
 
         }
