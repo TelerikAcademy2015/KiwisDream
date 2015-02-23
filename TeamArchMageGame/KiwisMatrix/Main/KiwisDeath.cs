@@ -13,8 +13,8 @@ namespace Main
         static int kiwiPositionX = 5;
         static int kiwiPositionY = 10;
         const int maxLives = 10;
-        const double maxSpeed = 300;
-        const int maxPulse = 255;
+        const int maxSpeed = 30;
+        const int maxPulse = 50;
         static int heigth = Console.BufferHeight = Console.WindowHeight = 25;
         static int width = Console.BufferWidth = Console.WindowWidth = 90;
         static int gameFieldWidth = width - 10;
@@ -58,14 +58,14 @@ namespace Main
          */
         static void Main()
         {
-            int menuStartX = 91;
-            int menuStartY = 10;
+            int menuStartX = 80;
+            int menuStartY = 2;
             int travelled = 0;
             int currentLives = 3;
-            double currentSpeed = 10;
+            int currentSpeed = 10;
             int currentPulse = 40;
 
-            
+
 
             PrintOnPosition(0, 5, gameBeginning, ConsoleColor.Cyan);
             //PrintOnPosition(0, 5, gameOver, ConsoleColor.Red);
@@ -74,6 +74,22 @@ namespace Main
             Console.CursorVisible = false;
             while (true)
             {
+                if (currentSpeed == maxSpeed)
+                {
+                    if (currentPulse == maxPulse)
+                    {
+                        Console.Clear();
+                        PrintOnPosition(0, 5, gameOver, ConsoleColor.Red);
+                        return;
+                    }
+                    currentSpeed = maxSpeed;
+                    currentPulse++;
+                }
+                else
+                {
+                    currentSpeed++;
+                }
+                
                 int chance = randomNum.Next(0, 101);
 
                 //TO DO: Spawn chances
@@ -105,8 +121,8 @@ namespace Main
                     MoveKiwi(pressedKey);
                 }
 
+
                 
-                //PrintOnPosition(menuStartX, menuStartY, "I killed the kiwi", ConsoleColor.Cyan);
 
                 //PrintGameField(gameField);
 
@@ -117,6 +133,8 @@ namespace Main
                 // Redraw the gameField after the clear(). Fixes movement tearing, BUT causes blue dot bug.
                 // Blue dot bug is fixed if this goes at the end of MoveKiwi, but tearing reaper
                 PrintGameField(gameField);
+                PrintMenu(menuStartX, menuStartY, travelled, currentLives, currentPulse, currentSpeed);
+                
 
             }
         }
@@ -209,12 +227,22 @@ namespace Main
                 Console.WriteLine();
             }
         }
-
-        static void PrintOnPosition(int x, int y, string shape, ConsoleColor color)
+        private static void PrintMenu(int positionX, int positionY, int travelled, int currentLives, int currentPulse, int currentSpeed)
+        {
+            PrintOnPosition(positionX, positionY, "Lives:", ConsoleColor.Cyan);
+            PrintOnPosition(positionX, positionY + 1, currentLives.ToString(), ConsoleColor.Cyan);
+            PrintOnPosition(positionX, positionY + 4, "Speed:", ConsoleColor.Cyan);
+            PrintOnPosition(positionX, positionY + 5, currentSpeed.ToString(), ConsoleColor.Cyan);
+            PrintOnPosition(positionX, positionY + 8, "Pulse:", ConsoleColor.Cyan);
+            PrintOnPosition(positionX, positionY + 9, currentPulse.ToString(), ConsoleColor.Cyan);
+            PrintOnPosition(positionX, positionY + 12, "Travelled:", ConsoleColor.Cyan);
+            PrintOnPosition(positionX, positionY + 13, travelled.ToString(), ConsoleColor.Cyan);
+        }
+        static void PrintOnPosition(int x, int y, string text, ConsoleColor color)
         {
             Console.SetCursorPosition(x, y);
             Console.ForegroundColor = color;
-            Console.WriteLine(shape);
+            Console.WriteLine(text);
         }
     }
 }
