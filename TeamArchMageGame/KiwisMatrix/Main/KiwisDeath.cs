@@ -30,6 +30,32 @@ namespace Main
             {'?', '?', '@', '?', '?'},
             {'?', '?', '|', '?', '?'}
         };
+        static char[,] smallBor = new char[3, 4]
+        {
+            {'?', '/', '\\', '?'}, 
+            {'/', '?', '?', '\\'}, 
+            {'?', '|', '|', '?'}
+        };
+        /*
+         * ?/\?
+         * /??\
+         * ?||?
+         */
+
+        static char[,] bigBor = new char[4, 6]
+        {
+            {'?', '?', '/', '\\', '?', '?'},
+            {'?', '/', '/', '\\', '\\', '?'},
+            {'/', '/', '/', '\\', '\\', '\\'},
+            {'?', '?', '|', '|', '?', '?'},
+
+        };         
+        /*
+         *  ??/\??
+         *  ?//\\?
+         *  ///\\\
+         *  ??||??
+         */
         static void Main()
         {
             int menuStartX = 91;
@@ -38,6 +64,8 @@ namespace Main
             int currentLives = 3;
             double currentSpeed = 10;
             int currentPulse = 40;
+
+            
 
             PrintOnPosition(0, 5, gameBeginning, ConsoleColor.Cyan);
             //PrintOnPosition(0, 5, gameOver, ConsoleColor.Red);
@@ -49,7 +77,10 @@ namespace Main
                 int chance = randomNum.Next(0, 101);
 
                 //TO DO: Spawn chances
-                //if (chance == 0 && chance = <= 20)
+                //if (chance == 0 && chance <= 20 || smallBorCheck)
+                //{
+
+                //}
 
                 // game field set up
                 FillGameField(gameField);
@@ -77,13 +108,15 @@ namespace Main
                 
                 //PrintOnPosition(menuStartX, menuStartY, "I killed the kiwi", ConsoleColor.Cyan);
 
-                PrintGameField(gameField);
-
+                //PrintGameField(gameField);
 
                 Thread.Sleep(150);
                 //Console.SetCursorPosition(0, 39);
                 Console.Clear();
-               
+
+                // Redraw the gameField after the clear(). Fixes movement tearing, BUT causes blue dot bug.
+                // Blue dot bug is fixed if this goes at the end of MoveKiwi, but tearing reaper
+                PrintGameField(gameField);
 
             }
         }
@@ -123,9 +156,6 @@ namespace Main
                     kiwiPositionX = kiwiPositionX + 2;
                 }
             }
-            // Bugfix below, do not remove
-            // Calling SetKiwiPosition after each position change, clears the blue buggy dots that appear
-            SetKiwiPosition(gameField);
         }
 
         private static void SetKiwiPosition(char[,] gameField)
