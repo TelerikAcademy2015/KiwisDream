@@ -374,14 +374,16 @@ namespace Main
             }
         }
         // Despawn
-        static int ccc = 0;
+        static int ccc = 3;
         private static void DespawnLeftTree(int spawnWidth, int spawnHeigth)
         {
             if (leftTreeCounter != 0)
             {
                 leftTreeCounter--;
             }
-            ccc = 0;
+            ccc = 3;
+            ccc = (ccc - leftTreeCounter) + 1;
+
             for (int row = leftTreeCounter, i = spawnWidth; row > 0; row--, i++)
             {
                 for (int col = 0, j = spawnHeigth; col < bigBor.GetLength(1); col++, j++)
