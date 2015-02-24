@@ -1,4 +1,9 @@
-﻿using System;
+﻿// BUGS SO FAR :
+/*
+ * 1. Когато се вземе живот или спийд със първия му чар (удар на първия чар на пилето и първия чар на живота/спийда), се отчита, че се е взел както живот, така и спийд.
+ */ 
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,12 +19,14 @@ namespace Main
         static int kiwiPositionY = 10;
         const int maxLives = 10;
         const int maxSpeed = 250;
+        const int minSpeed = 10;
         const int maxPulse = 180;
+        const int minPulse = 40;
         static int heigth = Console.BufferHeight = Console.WindowHeight = 30;
         static int width = Console.BufferWidth = Console.WindowWidth = 90;
         static int gameFieldWidth = width - 10;
         static int gameFieldHeigth = heigth - 5;
-        static char[,] gameField = new char[gameFieldHeigth, gameFieldWidth];
+        static char[,] gameField = new char[gameFieldHeigth, gameFieldWidth];   // 25,80
         // life variables
         static int lifeSpawnWidth;
         static int lifeSpawnHeight;
@@ -77,8 +84,8 @@ namespace Main
             int menuStartY = 2;
             int travelled = 0;
             int currentLives = 3;
-            int currentSpeed = 10;
-            int currentPulse = 40;
+            int currentSpeed = minSpeed;
+            int currentPulse = minPulse;
 
             // Hides the annoying cursor
             Console.CursorVisible = false;
@@ -119,14 +126,21 @@ namespace Main
 
                     // A check to make sure theres NOTHING on the spawn point
                     // TO DO (MATRIX WIDE 5x5 atleast CHECK, not just the first char !!!!!!!)
-                    // BROKEN, will fix it up soon
 
-                    //if (gameField[lifeSpawnWidth, lifeSpawnHeight] == '0' ||
-                    //    gameField[lifeSpawnWidth, lifeSpawnHeight] == '?')
-                    //{
-                        SpawnLifeUp(lifeSpawnWidth, lifeSpawnHeight);
-                        spawnedLife = true;
-                    //}
+                    // HERE IS THE REASON FOR BUG 1.
+                    try
+                    {
+                        if (gameField[lifeSpawnHeight, lifeSpawnWidth] == '0' ||
+                            gameField[lifeSpawnHeight, lifeSpawnWidth] == '?')
+                        {
+                            SpawnLifeUp(lifeSpawnWidth, lifeSpawnHeight);
+                            spawnedLife = true;
+                        }
+                    }
+                    catch (IndexOutOfRangeException e)
+                    {
+                        IndexOutOfRangeException(e); 
+                    }
                 }
                 else if (chance >= 11 && chance <= 20 && spawnedSpeed == false)
                 {
@@ -136,14 +150,21 @@ namespace Main
 
                     // A check to make sure theres NOTHING on the spawn point
                     // TO DO (MATRIX WIDE 5x5 atleast CHECK, not just the first char !!!!!!!)
-                    // BROKEN, will fix it up soon
 
-                    //if (gameField[speedSpawnWidth, speedSpawnHeight] == '0' ||
-                    //    gameField[speedSpawnWidth, speedSpawnHeight] == '?')
-                    //{
-                        SpawnSpeedDown(speedSpawnWidth, speedSpawnHeight);
-                        spawnedSpeed = true;
-                    //}
+                    // HERE IS THE REASON FOR BUG 1.
+                    try
+                    {
+                        if (gameField[speedSpawnHeight, speedSpawnWidth] == '0' ||
+                            gameField[speedSpawnHeight, speedSpawnWidth] == '?')
+                        {
+                            SpawnSpeedDown(speedSpawnWidth, speedSpawnHeight);
+                            spawnedSpeed = true;
+                        }
+                    }
+                    catch (IndexOutOfRangeException e)
+                    {
+                        IndexOutOfRangeException(e);
+                    }
                 }
 
 
@@ -178,14 +199,15 @@ namespace Main
                         if (spawnedSpeedTaken)
                         {
                             currentSpeed -= 100;
-                            if (currentSpeed <= 10)
+                            currentPulse = minPulse;
+                            if (currentSpeed <= minSpeed)
                             {
-                                currentSpeed = 10;
+                                currentSpeed = minSpeed;
                             }
                         }
                         speedTimeCounter = 80;
-                        spawnedLife = false;
-                        spawnedLifeTaken = false;
+                        spawnedSpeed = false;
+                        spawnedSpeedTaken = false;
                     }
                     else
                     {
@@ -215,7 +237,7 @@ namespace Main
 
                 // Check for collisions
                 CollisionWithLifeUp(kiwiPositionX, kiwiPositionY);
-                //CollisionWithSpeedDown(kiwiPositionX, kiwiPositionY);
+                CollisionWithSpeedDown(kiwiPositionX, kiwiPositionY);
 
                 // Slow down game
                 Thread.Sleep(150);
@@ -228,6 +250,7 @@ namespace Main
                 
             }
         }
+
 
         private static void MoveKiwi(ConsoleKeyInfo pressedKey)
         {
@@ -383,21 +406,27 @@ namespace Main
             }
         }
 
-        //private static void CollisionWithSpeedDown(int currentRow, int currentCol)
-        //{
-        //    for (int i = 0, row = currentRow; i < kiwi.GetLength(0); i++, row++)
-        //    {
-        //        for (int j = 0, col = currentCol; j < kiwi.GetLength(1); j++, row++)
-        //        {
-        //            for (int k = 0; k < speedDown.Length; k++)
-        //            {
-        //                if (gameField[row, col] == speedDown[k])
-        //                {
-        //                    spawnedSpeedTaken = true;
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
+        private static void CollisionWithSpeedDown(int currentRow, int currentCol)
+        {
+            for (int i = 0, row = currentRow; i < kiwi.GetLength(0); i++, row++)
+            {
+                for (int j = 0, col = currentCol; j < kiwi.GetLength(1); j++, col++)
+                {
+                    for (int k = 0; k < speedDown.Length; k++)
+                    {
+                        if (gameField[row, col] == speedDown[k])
+                        {
+                            spawnedSpeedTaken = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Format exceptions below
+        private static void IndexOutOfRangeException(IndexOutOfRangeException e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 }
