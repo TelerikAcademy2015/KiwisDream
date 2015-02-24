@@ -1,6 +1,6 @@
-              GGG        AA          MM   MM    EEEEEEE        OOOOO   V       V   EEEEEEE   RRRRR    @
-             G          A  A        M  M M  M   E              O   O   V       V   E         R    R   @
-             G         A    A      M    M    M  E              O   O    V     V    E         RRRRR    @
-             G  GGG   AAAAAAAA    M     M     M EEEEEE         O   O     V   V     EEEEEE    R R      @
-             G    G  A        A   M           M E              O   O      V V      E         R   R    
-              GGGG  A          A  M           M EEEEEEE        OOOOO       V       EEEEEEE   R    R   @
+        GGG       AA          MM   MM    EEEEEEE     OOOOO   V       V  EEEEEEE   RRRR
+       G         A  A        M  M M  M   E           O   O    V     V   E         R  R
+       G GGG    A    A      M    M    M  EEEEEEE     O   O     V   V    Eeeeee    RRRR
+       G  G    AAAAAAAA    M     M     M E           O   O      V V     E         R R 
+        GG    A        A   M           M EEEEEEE     OOOOO       v      EEEEEEE   R  R
+                                                                                
