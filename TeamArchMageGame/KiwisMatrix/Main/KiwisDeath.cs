@@ -20,11 +20,18 @@ namespace Main
         static int gameFieldWidth = width - 10;
         static int gameFieldHeigth = heigth - 5;
         static char[,] gameField = new char[gameFieldHeigth, gameFieldWidth];
+        // life variables
         static int lifeSpawnWidth;
         static int lifeSpawnHeight;
         static bool spawnedLife = false;
         static bool spawnedLifeTaken = false;
-        static int lifeTimeCounter = 100;
+        static int lifeTimeCounter = 80;
+        // speed down variables
+        static int speedSpawnWidth;
+        static int speedSpawnHeight;
+        static bool spawnedSpeed = false;
+        static bool spawnedSpeedTaken = false;
+        static int speedTimeCounter = 80;
 
         static string gameBeginning = System.IO.File.ReadAllText("../../../GameBeginningFile.txt");
         static string gameOver = System.IO.File.ReadAllText("../../../GameOverFile.txt");
@@ -62,6 +69,7 @@ namespace Main
          *  ??||??
          */
         static char[] lifeUp = new char[3] { '1', 'u', 'p' };
+        static char[] speedDown = new char[4] { 'S', 'p', 'd', 'D' };
  
         static void Main()
         {
@@ -103,14 +111,41 @@ namespace Main
                 // Spawn chances
                 int chance = randomNum.Next(0, 101);
 
-                if (chance >= 1 && chance <= 20 && spawnedLife == false) // bool check to spawn ONLY 1 life at a time
+                if (chance >= 1 && chance <= 10 && spawnedLife == false) // bool check to spawn ONLY 1 life at a time
                 {
                     // spawn life up;
                     lifeSpawnWidth = randomNum.Next(1, gameFieldWidth - 3);
                     lifeSpawnHeight = randomNum.Next(3, gameFieldHeigth - 1);
-                    SpawnLifeUp(lifeSpawnWidth, lifeSpawnHeight);
-                    spawnedLife = true;
+
+                    // A check to make sure theres NOTHING on the spawn point
+                    // TO DO (MATRIX WIDE 5x5 atleast CHECK, not just the first char !!!!!!!)
+                    // BROKEN, will fix it up soon
+
+                    //if (gameField[lifeSpawnWidth, lifeSpawnHeight] == '0' ||
+                    //    gameField[lifeSpawnWidth, lifeSpawnHeight] == '?')
+                    //{
+                        SpawnLifeUp(lifeSpawnWidth, lifeSpawnHeight);
+                        spawnedLife = true;
+                    //}
                 }
+                else if (chance >= 11 && chance <= 20 && spawnedSpeed == false)
+                {
+                    // spawn speed down
+                    speedSpawnWidth = randomNum.Next(1, gameFieldWidth - 4);
+                    speedSpawnHeight = randomNum.Next(3, gameFieldHeigth - 1);
+
+                    // A check to make sure theres NOTHING on the spawn point
+                    // TO DO (MATRIX WIDE 5x5 atleast CHECK, not just the first char !!!!!!!)
+                    // BROKEN, will fix it up soon
+
+                    //if (gameField[speedSpawnWidth, speedSpawnHeight] == '0' ||
+                    //    gameField[speedSpawnWidth, speedSpawnHeight] == '?')
+                    //{
+                        SpawnSpeedDown(speedSpawnWidth, speedSpawnHeight);
+                        spawnedSpeed = true;
+                    //}
+                }
+
 
                 // Checks if life is spawned, IF SO it keeps it there while the player takes is OR the counter ENDS
                 // if the counter reaches zero, on the next itteration the life will be GONE, and a new one can be spawned. When 1 life is spawned, another one CANNOT be spanwed.
@@ -126,16 +161,39 @@ namespace Main
                                 currentLives = maxLives;
                             }
                         }
-                        lifeTimeCounter = 100;
+                        lifeTimeCounter = 80;
                         spawnedLife = false;
                         spawnedLifeTaken = false;
                     }
                     else
                     {
                         lifeTimeCounter--;
-                        SpawnLifeUp(lifeSpawnWidth, lifeSpawnHeight);
+                        SpawnLifeUp(lifeSpawnWidth, lifeSpawnHeight); // Keep spawning the life at the same place
                     }
                 }
+                if (spawnedSpeed)
+                {
+                    if (speedTimeCounter == 0 || spawnedSpeedTaken)
+                    {
+                        if (spawnedSpeedTaken)
+                        {
+                            currentSpeed -= 100;
+                            if (currentSpeed <= 10)
+                            {
+                                currentSpeed = 10;
+                            }
+                        }
+                        speedTimeCounter = 80;
+                        spawnedLife = false;
+                        spawnedLifeTaken = false;
+                    }
+                    else
+                    {
+                        speedTimeCounter--;
+                        SpawnSpeedDown(speedSpawnWidth, speedSpawnHeight); // Keep spawning the speed at the same place
+                    }
+                }
+
 
                 // Draw KIWI
                 SetKiwiPosition(gameField);
@@ -157,6 +215,7 @@ namespace Main
 
                 // Check for collisions
                 CollisionWithLifeUp(kiwiPositionX, kiwiPositionY);
+                //CollisionWithSpeedDown(kiwiPositionX, kiwiPositionY);
 
                 // Slow down game
                 Thread.Sleep(150);
@@ -225,6 +284,14 @@ namespace Main
             for (int index = 0, j = spawnWidth; index < lifeUp.Length; index++, j++)
             {
                 gameField[spawnHeight, j] = lifeUp[index];
+            }
+        }
+
+        private static void SpawnSpeedDown(int spawnWidth, int spawnHeight)
+        {
+            for (int index = 0, j = spawnWidth; index < speedDown.Length; index++, j++)
+            {
+                gameField[spawnHeight, j] = speedDown[index];
             }
         }
 
@@ -315,5 +382,22 @@ namespace Main
                 }
             }
         }
+
+        //private static void CollisionWithSpeedDown(int currentRow, int currentCol)
+        //{
+        //    for (int i = 0, row = currentRow; i < kiwi.GetLength(0); i++, row++)
+        //    {
+        //        for (int j = 0, col = currentCol; j < kiwi.GetLength(1); j++, row++)
+        //        {
+        //            for (int k = 0; k < speedDown.Length; k++)
+        //            {
+        //                if (gameField[row, col] == speedDown[k])
+        //                {
+        //                    spawnedSpeedTaken = true;
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
     }
 }
