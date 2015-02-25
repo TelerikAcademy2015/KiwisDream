@@ -316,28 +316,28 @@ namespace Main
             {
                 if (kiwiPositionY - 2 >= 0)
                 {
-                    kiwiPositionY = kiwiPositionY - 2;
+                    kiwiPositionY -= 2;
                 }
             }
             if (pressedKey.Key == ConsoleKey.RightArrow)
             {
                 if (kiwiPositionY + 2 <= gameFieldWidth - kiwi.GetLength(1) - 1)
                 {
-                    kiwiPositionY = kiwiPositionY + 2;
+                    kiwiPositionY += 2;
                 }
             }
             if (pressedKey.Key == ConsoleKey.UpArrow)
             {
                 if (kiwiPositionX - 2 >= 0)
                 {
-                    kiwiPositionX = kiwiPositionX - 2;
+                    kiwiPositionX -= 2;
                 }
             }
             if (pressedKey.Key == ConsoleKey.DownArrow)
             {
                 if (kiwiPositionX + 2 <= heigth - kiwi.GetLength(0))
                 {
-                    kiwiPositionX = kiwiPositionX + 2;
+                    kiwiPositionX += 2;
                 }
             }
         }
@@ -375,7 +375,7 @@ namespace Main
 
         private static void SpawnLeftTree(int spawnWidth, int spawnHeigth)
         {
-            if (leftTreeCounter != bigBor.GetLength(0))
+            if (leftTreeCounter < bigBor.GetLength(0))
             {
                 leftTreeCounter++;
             }
@@ -391,7 +391,7 @@ namespace Main
         
         private static void DespawnLeftTree(int spawnWidth, int spawnHeigth)
         {
-            if (leftTreeCounter != 0)
+            if (leftTreeCounter > 0)
             {
                 leftTreeCounter--;
             }
@@ -542,7 +542,7 @@ namespace Main
                     {
                         for (int borCol = 0; borCol < bigBor.GetLength(1); borCol++)
                         {
-                            if (gameField[row, col] == bigBor[borRow, borCol] && bigBor[borRow, borCol] != '?')
+                            if ((gameField[row, col] == bigBor[borRow, borCol]) && (bigBor[borRow, borCol] != '?'))
                             {
                                 borCollision = true;
                             }
