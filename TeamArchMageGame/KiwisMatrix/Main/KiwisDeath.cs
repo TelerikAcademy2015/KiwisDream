@@ -18,14 +18,15 @@ namespace Main
         static int kiwiPositionX = 5;
         static int kiwiPositionY = 10;
         const int maxLives = 10;
-        const int maxSpeed = 250;
+        static int currentLives = 3;
+        const int maxSpeed = 200;
         const int minSpeed = 10;
         const int maxPulse = 180;
         const int minPulse = 40;
-        static int heigth = Console.BufferHeight = Console.WindowHeight = 30;
-        static int width = Console.BufferWidth = Console.WindowWidth = 90;
-        static int gameFieldWidth = width - 10;
-        static int gameFieldHeigth = heigth - 5;
+        static int heigth = Console.BufferHeight = Console.WindowHeight = 35;
+        static int width = Console.BufferWidth = Console.WindowWidth = 100;
+        static int gameFieldWidth = width - 15;
+        static int gameFieldHeigth = heigth;
         static char[,] gameField = new char[gameFieldHeigth, gameFieldWidth];   // 25,80
         // life variables
         static int lifeSpawnWidth;
@@ -39,6 +40,16 @@ namespace Main
         static bool spawnedSpeed = false;
         static bool spawnedSpeedTaken = false;
         static int speedTimeCounter = 80;
+
+        static int treeSpawnWidth;
+        static int treeSpawnHeigth;
+        static bool borCollision;
+        // left tree variables
+        static bool spawnedLeftTree = false;
+        static int leftTreeCounter = -1;
+        static int leftTreeDespawnCounter = 3;
+        // middle tree variables
+        // right tree variables
 
         static string gameBeginning = System.IO.File.ReadAllText("../../../GameBeginningFile.txt");
         static string gameOver = System.IO.File.ReadAllText("../../../GameOverFile.txt");
@@ -61,36 +72,36 @@ namespace Main
          * ?||?
          */
 
-        static char[,] bigBor = new char[4, 6]
+        static char[,] bigBor = new char[4, 5]
         {
-            {'?', '?', '/', '\\', '?', '?'},
-            {'?', '/', '/', '\\', '\\', '?'},
-            {'/', '/', '/', '\\', '\\', '\\'},
-            {'?', '?', '|', '|', '?', '?'},
+            {'?', '?', '^', '?', '?'},
+            {'?', '^', '^', '^', '?'},
+            {'^', '^', '^', '^', '^'},
+            {'?', '?', '$', '?', '?'},
 
         };         
-        /*
-         *  ??/\??
-         *  ?//\\?
-         *  ///\\\
-         *  ??||??
+        /*             
+         *  ??/\??     ??^??
+         *  ?//\\?     ?^^^?
+         *  ///\\\     ^^^^^
+         *  ??||??     ??$??
          */
         static char[] lifeUp = new char[3] { '1', 'u', 'p' };
         static char[] speedDown = new char[4] { 'S', 'p', 'd', 'D' };
  
         static void Main()
         {
-            int menuStartX = 80;
+            int menuStartX = 85;
             int menuStartY = 2;
             int travelled = 0;
-            int currentLives = 3;
             int currentSpeed = minSpeed;
             int currentPulse = minPulse;
 
             // Hides the annoying cursor
             Console.CursorVisible = false;
-            PrintOnPosition(0, 5, gameBeginning, ConsoleColor.Cyan);
+            PrintMessages(0, 5, gameBeginning, ConsoleColor.Cyan);
             ConsoleKeyInfo key = Console.ReadKey(true);
+            
 
             while (true)
             {
@@ -99,10 +110,7 @@ namespace Main
                 {
                     if (currentPulse == maxPulse)
                     {
-                        Console.Clear();
-                        PrintOnPosition(0, 10, gameOver, ConsoleColor.Red);
-                        Console.ReadKey();
-                        return;
+                        GameOver();
                     }
                     currentSpeed = maxSpeed;
                     currentPulse++;
@@ -121,7 +129,7 @@ namespace Main
                 if (chance >= 1 && chance <= 10 && spawnedLife == false) // bool check to spawn ONLY 1 life at a time
                 {
                     // spawn life up;
-                    lifeSpawnWidth = randomNum.Next(1, gameFieldWidth - 3);
+                    lifeSpawnWidth = randomNum.Next(1, gameFieldWidth - lifeUp.Length);
                     lifeSpawnHeight = randomNum.Next(3, gameFieldHeigth - 1);
 
                     // A check to make sure theres NOTHING on the spawn point
@@ -145,7 +153,7 @@ namespace Main
                 else if (chance >= 11 && chance <= 20 && spawnedSpeed == false)
                 {
                     // spawn speed down
-                    speedSpawnWidth = randomNum.Next(1, gameFieldWidth - 4);
+                    speedSpawnWidth = randomNum.Next(1, gameFieldWidth - speedDown.Length);
                     speedSpawnHeight = randomNum.Next(3, gameFieldHeigth - 1);
 
                     // A check to make sure theres NOTHING on the spawn point
@@ -166,7 +174,24 @@ namespace Main
                         IndexOutOfRangeException(e);
                     }
                 }
+                else if (chance >= 21 && chance <= 40 && spawnedLeftTree == false)
+                {
+                    treeSpawnWidth = randomNum.Next(1, (gameFieldWidth / 3)- bigBor.GetLength(1));
+                    treeSpawnHeigth = gameFieldHeigth - 1;
 
+                    SpawnLeftTree(treeSpawnWidth, treeSpawnHeigth);
+                    spawnedLeftTree = true;
+                }
+                //else if (chance >= 41 && chance <= 60 && spawnedMiddleTree == false)
+                //{
+                //    speedSpawnWidth = randomNum.Next(1, gameFieldWidth - 4);
+                //    speedSpawnHeight = randomNum.Next(3, gameFieldHeigth - 1);
+                //}
+                //else if (chance >= 61 && chance <= 80 && spawnedRightTree == false)
+                //{
+                //    speedSpawnWidth = randomNum.Next(1, gameFieldWidth - 4);
+                //    speedSpawnHeight = randomNum.Next(3, gameFieldHeigth - 1);
+                //}
 
                 // Checks if life is spawned, IF SO it keeps it there while the player takes is OR the counter ENDS
                 // if the counter reaches zero, on the next itteration the life will be GONE, and a new one can be spawned. When 1 life is spawned, another one CANNOT be spanwed.
@@ -215,6 +240,22 @@ namespace Main
                         SpawnSpeedDown(speedSpawnWidth, speedSpawnHeight); // Keep spawning the speed at the same place
                     }
                 }
+                if (spawnedLeftTree)
+                {
+                    treeSpawnHeigth--;
+                    if (treeSpawnHeigth <= 2)
+                    {
+                        DespawnLeftTree(treeSpawnHeigth, treeSpawnWidth);
+                        if (leftTreeCounter == 0)
+                        {
+                            spawnedLeftTree = false;
+                        }
+                    }
+                    else
+                    {
+                        SpawnLeftTree(treeSpawnHeigth, treeSpawnWidth);
+                    }                   
+                }
 
 
                 // Draw KIWI
@@ -238,15 +279,32 @@ namespace Main
                 // Check for collisions
                 CollisionWithLifeUp(kiwiPositionX, kiwiPositionY);
                 CollisionWithSpeedDown(kiwiPositionX, kiwiPositionY);
+                CollisionWithBigBor(kiwiPositionX, kiwiPositionY);
+
+                if (borCollision == true)
+                {
+                    //Console.Beep();
+                    borCollision = false;
+                    currentLives--;
+                    travelled = 0;
+                    kiwi[2, 2] = 'X';
+                    Thread.Sleep(4000);
+                    kiwi[2, 2] = '@';
+                    if (currentLives <= 0)
+                    {
+                        GameOver();
+                    }
+                }
 
                 // Slow down game
-                Thread.Sleep(150);
+                Thread.Sleep((200 - currentSpeed) >= 50 ? (200 - currentSpeed) : 50);
                 Console.Clear();
 
                 // Redraw the gameField after the clear(). Fixes movement tearing, BUT causes blue dot bug.
                 // Blue dot bug is fixed if this goes at the end of MoveKiwi, but tearing reapers
                 PrintGameField(gameField);
-                PrintMenu(menuStartX, menuStartY, travelled, currentLives, currentPulse, currentSpeed);
+                PrintStaticMenu(menuStartX, menuStartY);
+                PrintDynamicMenu(menuStartX, menuStartY, travelled, currentLives, currentPulse, currentSpeed);
                 
             }
         }
@@ -263,7 +321,7 @@ namespace Main
             }
             if (pressedKey.Key == ConsoleKey.RightArrow)
             {
-                if (kiwiPositionY + 2 <= gameFieldWidth - 5)
+                if (kiwiPositionY + 2 <= gameFieldWidth - kiwi.GetLength(1) - 1)
                 {
                     kiwiPositionY = kiwiPositionY + 2;
                 }
@@ -277,7 +335,7 @@ namespace Main
             }
             if (pressedKey.Key == ConsoleKey.DownArrow)
             {
-                if (kiwiPositionX + 2 <= heigth - 9)
+                if (kiwiPositionX + 2 <= heigth - kiwi.GetLength(0))
                 {
                     kiwiPositionX = kiwiPositionX + 2;
                 }
@@ -294,14 +352,11 @@ namespace Main
                     {
                         gameField[currentRow, currenCol] = kiwi[i, j];
                     }
-                    else
-                    {
-                        //TO DO COLLISION
-                    }
                 }
             }
         }
 
+        // Spawning below
         private static void SpawnLifeUp(int spawnWidth, int spawnHeight)
         {
             for (int index = 0, j = spawnWidth; index < lifeUp.Length; index++, j++)
@@ -318,6 +373,42 @@ namespace Main
             }
         }
 
+        private static void SpawnLeftTree(int spawnWidth, int spawnHeigth)
+        {
+            if (leftTreeCounter != bigBor.GetLength(0))
+            {
+                leftTreeCounter++;
+            }
+            for (int row = 0, i = spawnWidth; row < leftTreeCounter; row++, i++)
+            {
+                for (int col = 0, j = spawnHeigth; col < bigBor.GetLength(1); col++, j++)
+                {
+                        gameField[i, j] = bigBor[row, col];                  
+                }
+            }
+        }
+        // Despawn
+        
+        private static void DespawnLeftTree(int spawnWidth, int spawnHeigth)
+        {
+            if (leftTreeCounter != 0)
+            {
+                leftTreeCounter--;
+            }
+            leftTreeDespawnCounter = 3;
+            leftTreeDespawnCounter = (leftTreeDespawnCounter - leftTreeCounter) + 1;
+
+            for (int row = leftTreeCounter, i = spawnWidth; row > 0; row--, i++)
+            {
+                for (int col = 0, j = spawnHeigth; col < bigBor.GetLength(1); col++, j++)
+                {
+                    gameField[i, j] = bigBor[leftTreeDespawnCounter, col];                  
+                }
+                leftTreeDespawnCounter++;
+            }
+        }
+
+        // Filling game field
         private static void FillGameField(char[,] gameField)
         {
             for (int row = 0; row < gameField.GetLength(0); row++)
@@ -329,6 +420,7 @@ namespace Main
             }
         }
 
+        // Printing below
         private static void PrintGameField(char[,] gameField)
         {
             for (int row = 0; row < gameField.GetLength(0); row++)
@@ -337,51 +429,68 @@ namespace Main
                 {
                     if (gameField[row, col] == '?' || gameField[row, col] == '0')
                     {
-                        Console.Out.Write(gameField[row, col] = default(char));
+                        
                     }
                     else
                     {
-                        Console.Out.Write(gameField[row, col]);
+                        Console.SetCursorPosition(col, row);
+                        Console.Write(gameField[row, col]);
                     }
                     if (col == gameField.GetLength(1) - 1)
                     {
-                        Console.Out.Write(gameField[row, col] = ' ');
+                        Console.SetCursorPosition(col, row);
+                        Console.Out.Write(gameField[row, col] = '|');
                     }
                 }
-                Console.Out.WriteLine();
             }
         }
-        private static void PrintMenu(int positionX, int positionY, int travelled, int currentLives, int currentPulse, int currentSpeed)
-        {
-            PrintOnPosition(positionX, positionY, "Lives:", ConsoleColor.White);
+        private static void PrintDynamicMenu(int positionX, int positionY, int travelled, int currentLives, int currentPulse, int currentSpeed)
+        {            
             if (currentLives == 1)
             {
-                PrintOnPosition(positionX, positionY + 1, currentLives.ToString(), ConsoleColor.Red);
+                PrintMessages(positionX + 2, positionY + 4, currentLives.ToString(), ConsoleColor.Red);
             }
             else if (currentLives > 1 && currentLives <= 3)
             {
-                PrintOnPosition(positionX, positionY + 1, currentLives.ToString(), ConsoleColor.Yellow);
+                PrintMessages(positionX + 2, positionY + 4, currentLives.ToString(), ConsoleColor.Yellow);
             }
             else
             {
-                PrintOnPosition(positionX, positionY + 1, currentLives.ToString(), ConsoleColor.Green);
+                PrintMessages(positionX + 2, positionY + 4, currentLives.ToString(), ConsoleColor.Green);
             }
-
-            PrintOnPosition(positionX, positionY + 4, "Speed:", ConsoleColor.White);
+            
             if (currentSpeed < maxSpeed)
             {
-                PrintOnPosition(positionX, positionY + 5, currentSpeed.ToString(), ConsoleColor.Cyan);
+                PrintMessages(positionX + 2, positionY + 10, currentSpeed.ToString(), ConsoleColor.Cyan);
             }
             else
             {
-                PrintOnPosition(positionX, positionY + 5, currentSpeed.ToString(), ConsoleColor.Red);
-            }
-            PrintOnPosition(positionX, positionY + 8, "Pulse:", ConsoleColor.White);
-            PrintOnPosition(positionX, positionY + 9, currentPulse.ToString(), ConsoleColor.Red);
-            PrintOnPosition(positionX, positionY + 12, "Travelled:", ConsoleColor.White);
-            PrintOnPosition(positionX, positionY + 13, travelled.ToString(), ConsoleColor.Cyan);
+                PrintMessages(positionX + 2, positionY + 10, currentSpeed.ToString(), ConsoleColor.Red);
+            }            
+            PrintMessages(positionX + 2, positionY + 16, currentPulse.ToString(), ConsoleColor.Red);           
+            PrintMessages(positionX + 2, positionY + 22, travelled.ToString(), ConsoleColor.Cyan);
         }
-        static void PrintOnPosition(int x, int y, string text, ConsoleColor color)
+
+        private static void PrintStaticMenu(int positionX, int positionY)
+        {
+            PrintMessages(positionX, positionY + 2, "Lives:", ConsoleColor.White);
+            PrintMessages(positionX + 2, positionY + 3, "Curr /", ConsoleColor.DarkGray);
+            PrintMessages(positionX + 9, positionY + 3, "Max", ConsoleColor.DarkGray);
+            PrintMessages(positionX + 7, positionY + 4, "/", ConsoleColor.DarkGray);
+            PrintMessages(positionX + 9, positionY + 4, maxLives.ToString(), ConsoleColor.Gray);
+            PrintMessages(positionX, positionY + 8, "Speed:", ConsoleColor.White);
+            PrintMessages(positionX + 2, positionY + 9, "Curr /", ConsoleColor.DarkGray);
+            PrintMessages(positionX + 9, positionY + 9, "Max", ConsoleColor.DarkGray);
+            PrintMessages(positionX + 7, positionY + 10, "/", ConsoleColor.DarkGray);
+            PrintMessages(positionX + 9, positionY + 10, maxSpeed.ToString(), ConsoleColor.Gray);
+            PrintMessages(positionX, positionY + 14, "Pulse:", ConsoleColor.White);
+            PrintMessages(positionX + 2, positionY + 15, "Curr /", ConsoleColor.DarkGray);
+            PrintMessages(positionX + 9, positionY + 15, "Max", ConsoleColor.DarkGray);
+            PrintMessages(positionX + 7, positionY + 16, "/", ConsoleColor.DarkGray);
+            PrintMessages(positionX + 9, positionY + 16, maxPulse.ToString(), ConsoleColor.Gray);
+            PrintMessages(positionX, positionY + 20, "Travelled:", ConsoleColor.White);
+        }
+        static void PrintMessages(int x, int y, string text, ConsoleColor color)
         {
             Console.SetCursorPosition(x, y);
             Console.ForegroundColor = color;
@@ -423,6 +532,33 @@ namespace Main
             }
         }
 
+        private static void CollisionWithBigBor(int currentRow, int currentCol)
+        {
+            for (int row = currentRow, i = 0; i < kiwi.GetLength(0); row++, i++)
+            {
+                for (int col = currentCol, j = 0; j < kiwi.GetLength(1); col++, j++)
+                {
+                    for (int borRow = 0; borRow < bigBor.GetLength(0); borRow++)
+                    {
+                        for (int borCol = 0; borCol < bigBor.GetLength(1); borCol++)
+                        {
+                            if (gameField[row, col] == bigBor[borRow, borCol] && bigBor[borRow, borCol] != '?')
+                            {
+                                borCollision = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        private static void GameOver()
+        {
+            Thread.Sleep(1000);
+            Console.Clear();
+            PrintMessages(0, 10, gameOver, ConsoleColor.Red);
+            Console.ReadKey();
+            Environment.Exit(0);
+        }
         // Format exceptions below
         private static void IndexOutOfRangeException(IndexOutOfRangeException e)
         {
