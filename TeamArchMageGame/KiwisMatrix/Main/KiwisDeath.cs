@@ -41,14 +41,21 @@ namespace Main
         static bool spawnedSpeedTaken = false;
         static int speedTimeCounter = 80;
 
-        static int treeSpawnWidth;
-        static int treeSpawnHeigth;
+
         static bool borCollision;
         // left tree variables
+        static int leftTreeSpawnWidth;
+        static int leftTreeSpawnHeigth;
         static bool spawnedLeftTree = false;
         static int leftTreeCounter = -1;
         static int leftTreeDespawnCounter = 3;
         // middle tree variables
+        static int middleTreeSpawnWidth;
+        static int middleTreeSpawnHeigth;
+        static bool spawnedMiddleTree = false;
+        static int middleTreeCounter = -1;
+        static int middleTreeDespawnCounter = 3;
+
         // right tree variables
 
         static string gameBeginning = System.IO.File.ReadAllText("../../../GameBeginningFile.txt");
@@ -176,17 +183,20 @@ namespace Main
                 }
                 else if (chance >= 21 && chance <= 40 && spawnedLeftTree == false)
                 {
-                    treeSpawnWidth = randomNum.Next(1, (gameFieldWidth / 3)- bigBor.GetLength(1));
-                    treeSpawnHeigth = gameFieldHeigth - 1;
+                    leftTreeSpawnWidth = randomNum.Next(1, (gameFieldWidth / 3)- bigBor.GetLength(1));
+                    leftTreeSpawnHeigth = gameFieldHeigth - 1;
 
-                    SpawnLeftTree(treeSpawnWidth, treeSpawnHeigth);
+                    SpawnLeftTree(leftTreeSpawnWidth, leftTreeSpawnHeigth);
                     spawnedLeftTree = true;
                 }
-                //else if (chance >= 41 && chance <= 60 && spawnedMiddleTree == false)
-                //{
-                //    speedSpawnWidth = randomNum.Next(1, gameFieldWidth - 4);
-                //    speedSpawnHeight = randomNum.Next(3, gameFieldHeigth - 1);
-                //}
+                else if (chance >= 41 && chance <= 60 && spawnedMiddleTree == false)
+                {
+                    middleTreeSpawnWidth = randomNum.Next((gameFieldWidth / 3), (((gameFieldWidth * 2) / 3)) - bigBor.GetLength(1));
+                    middleTreeSpawnHeigth = gameFieldHeigth - 1;
+
+                    SpawnMiddleTree(middleTreeSpawnWidth, middleTreeSpawnHeigth);
+                    spawnedMiddleTree = true;
+                }
                 //else if (chance >= 61 && chance <= 80 && spawnedRightTree == false)
                 //{
                 //    speedSpawnWidth = randomNum.Next(1, gameFieldWidth - 4);
@@ -242,10 +252,10 @@ namespace Main
                 }
                 if (spawnedLeftTree)
                 {
-                    treeSpawnHeigth--;
-                    if (treeSpawnHeigth <= 2)
+                    leftTreeSpawnHeigth--;
+                    if (leftTreeSpawnHeigth <= 2)
                     {
-                        DespawnLeftTree(treeSpawnHeigth, treeSpawnWidth);
+                        DespawnLeftTree(leftTreeSpawnHeigth, leftTreeSpawnWidth);
                         if (leftTreeCounter == 0)
                         {
                             spawnedLeftTree = false;
@@ -253,10 +263,25 @@ namespace Main
                     }
                     else
                     {
-                        SpawnLeftTree(treeSpawnHeigth, treeSpawnWidth);
+                        SpawnLeftTree(leftTreeSpawnHeigth, leftTreeSpawnWidth);
                     }                   
                 }
-
+                if (spawnedMiddleTree)
+                {
+                    middleTreeSpawnHeigth--;
+                    if (middleTreeSpawnHeigth <= 2)
+                    {
+                        DespawnMiddleTree(middleTreeSpawnHeigth, middleTreeSpawnWidth);
+                        if (middleTreeCounter == 0)
+                        {
+                            spawnedMiddleTree = false;
+                        }
+                    }
+                    else
+                    {
+                        SpawnMiddleTree(middleTreeSpawnHeigth, middleTreeSpawnWidth);
+                    }  
+                }
 
                 // Draw KIWI
                 SetKiwiPosition(gameField);
@@ -284,7 +309,7 @@ namespace Main
 
 
                 // Slow down game
-                Thread.Sleep((300- currentSpeed) >= 50 ? (200 - currentSpeed) : 150);
+                Thread.Sleep(1); //(100- currentSpeed) >= 50 ? (200 - currentSpeed) : 150
                 Console.Clear();
 
                 // Redraw the gameField after the clear(). Fixes movement tearing, BUT causes blue dot bug.
@@ -395,6 +420,21 @@ namespace Main
                 }
             }
         }
+
+        private static void SpawnMiddleTree(int spawnWidth, int spawnHeigth)
+        {
+            if (middleTreeCounter < bigBor.GetLength(0))
+            {
+                middleTreeCounter++;
+            }
+            for (int row = 0, i = spawnWidth; row < middleTreeCounter; row++, i++)
+            {
+                for (int col = 0, j = spawnHeigth; col < bigBor.GetLength(1); col++, j++)
+                {
+                    gameField[i, j] = bigBor[row, col];
+                }
+            }
+        }
         // Despawn
 
         private static void DeleteTree(int spawnWidth, int spawnHeigth)
@@ -421,6 +461,24 @@ namespace Main
             }
         }
 
+        private static void DespawnMiddleTree(int spawnWidth, int spawnHeigth)
+        {
+            if (middleTreeCounter > 0)
+            {
+                middleTreeCounter--;
+            }
+            middleTreeDespawnCounter = 3;
+            middleTreeDespawnCounter = (middleTreeDespawnCounter - middleTreeCounter) + 1;
+
+            for (int row = middleTreeCounter, i = spawnWidth; row > 0; row--, i++)
+            {
+                for (int col = 0, j = spawnHeigth; col < bigBor.GetLength(1); col++, j++)
+                {
+                    gameField[i, j] = bigBor[middleTreeDespawnCounter, col];
+                }
+                middleTreeDespawnCounter++;
+            }
+        }
         // Filling game field
         private static void FillGameField(char[,] gameField)
         {
