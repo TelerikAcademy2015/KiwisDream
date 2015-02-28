@@ -11,12 +11,13 @@ namespace music
     {
         static void Main()
         {
-            //(new SoundPlayer(@"C:\Users\Yumo\Desktop\kiviwav.wav")).PlayLooping();
-            //(new SoundPlayer(@"C:\Users\Yumo\Desktop\kiviwav.wav")).SoundLocation(C:\Users\Yumo\Desktop\kiviwav.wav);
-            SoundPlayer player = new SoundPlayer();
-            player.SoundLocation = @"C:\Users\Yumo\Desktop\kiviwav.wav";
-            player.PlaySync();
-            player.PlayLooping();
+            while (true)
+            {
+                SoundPlayer player = new SoundPlayer();
+                player.SoundLocation = @"C:\Users\Yumo\Desktop\Final2.wav";
+                player.PlaySync();
+            }
+
         }
     }
 }
