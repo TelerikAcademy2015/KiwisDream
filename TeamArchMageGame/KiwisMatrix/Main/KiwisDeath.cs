@@ -344,6 +344,10 @@ namespace Main
                     kiwiPositionX += 2;
                 }
             }
+            if (pressedKey.Key == ConsoleKey.P)
+            {
+                Pause();
+            }
         }
 
         private static void SetKiwiPosition(char[,] gameField)
@@ -612,6 +616,15 @@ namespace Main
             }
         }
 
+        public static void Pause()
+        {
+            Console.WriteLine("The game is paused ");
+            System.Diagnostics.Process pauseProc =
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                { FileName = "cmd", Arguments = "/C pause", UseShellExecute = false 
+                });
+            pauseProc.WaitForExit();
 
+        }
     }
 }
