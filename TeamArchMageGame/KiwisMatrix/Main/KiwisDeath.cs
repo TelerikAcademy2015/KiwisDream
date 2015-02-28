@@ -281,23 +281,10 @@ namespace Main
                 CollisionWithSpeedDown(kiwiPositionX, kiwiPositionY);
                 CollisionWithBigBor(kiwiPositionX, kiwiPositionY);
 
-                if (borCollision == true)
-                {
-                    //Console.Beep();
-                    borCollision = false;
-                    currentLives--;
-                    travelled = 0;
-                    kiwi[2, 2] = 'X';
-                    Thread.Sleep(4000);
-                    kiwi[2, 2] = '@';
-                    if (currentLives <= 0)
-                    {
-                        GameOver();
-                    }
-                }
+
 
                 // Slow down game
-                Thread.Sleep((200 - currentSpeed) >= 50 ? (200 - currentSpeed) : 50);
+                Thread.Sleep((300- currentSpeed) >= 50 ? (200 - currentSpeed) : 150);
                 Console.Clear();
 
                 // Redraw the gameField after the clear(). Fixes movement tearing, BUT causes blue dot bug.
@@ -305,6 +292,23 @@ namespace Main
                 PrintGameField(gameField);
                 PrintStaticMenu(menuStartX, menuStartY);
                 PrintDynamicMenu(menuStartX, menuStartY, travelled, currentLives, currentPulse, currentSpeed);
+
+                if (borCollision == true)
+                {
+                    Console.Beep();
+                    Console.BackgroundColor = ConsoleColor.Red;
+                    borCollision = false;
+                    currentLives--;
+                    travelled = 0;
+                    kiwi[2, 2] = 'X';
+                    Thread.Sleep(1000);
+                    Console.BackgroundColor = ConsoleColor.White;
+                    kiwi[2, 2] = '@';
+                    if (currentLives <= 0)
+                    {
+                        GameOver();
+                    }
+                }
                 
             }
         }
@@ -388,6 +392,11 @@ namespace Main
             }
         }
         // Despawn
+
+        private static void DeleteTree(int spawnWidth, int spawnHeigth)
+        {
+
+        }
         
         private static void DespawnLeftTree(int spawnWidth, int spawnHeigth)
         {
@@ -423,10 +432,13 @@ namespace Main
         // Printing below
         private static void PrintGameField(char[,] gameField)
         {
+
+
             for (int row = 0; row < gameField.GetLength(0); row++)
             {
                 for (int col = 0; col < gameField.GetLength(1); col++)
                 {
+                    SetColors(row, col);
                     if (gameField[row, col] == '?' || gameField[row, col] == '0')
                     {
                         
@@ -542,7 +554,7 @@ namespace Main
                     {
                         for (int borCol = 0; borCol < bigBor.GetLength(1); borCol++)
                         {
-                            if ((gameField[row, col] == bigBor[borRow, borCol]) && (bigBor[borRow, borCol] != '?'))
+                            if ((gameField[row+1, col] == bigBor[borRow, borCol]) && (bigBor[borRow, borCol] != '?'))
                             {
                                 borCollision = true;
                             }
@@ -564,5 +576,42 @@ namespace Main
         {
             Console.WriteLine(e.Message);
         }
+
+        static void SetColors(int row, int col)
+        {
+            if ( gameField[row, col] == '\\' || gameField[row, col] == '/' || gameField[row, col] == '(' || gameField[row, col] == ')' || gameField[row, col] == '(' || gameField[row, col] == '@')
+            {
+                Console.ForegroundColor = ConsoleColor.Magenta;
+            }
+            
+             if (gameField[row, col] == '"')
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+            }
+
+            if (gameField[row, col] == '|')
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+            }
+
+            if (gameField[row, col] == '^')
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+
+            }
+            if (gameField[row, col] == '$')
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+
+            }
+
+            if (gameField[row, col] == '0')
+            {
+                Console.ForegroundColor = ConsoleColor.Blue;
+
+            }
+        }
+
+
     }
 }
