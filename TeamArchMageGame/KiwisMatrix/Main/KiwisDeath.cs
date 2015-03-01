@@ -1,11 +1,12 @@
 ﻿// BUGS SO FAR :
 /*
  * 1. Когато се вземе живот или спийд със първия му чар (удар на първия чар на пилето и първия чар на живота/спийда), се отчита, че се е взел както живот, така и спийд.
- */ 
+ */
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,9 +24,9 @@ namespace Main
         const int minSpeed = 10;
         const int maxPulse = 180;
         const int minPulse = 40;
-        static int heigth = Console.BufferHeight = Console.WindowHeight = 35;
+        static int heigth = Console.BufferHeight = Console.WindowHeight = 45;
         static int width = Console.BufferWidth = Console.WindowWidth = 100;
-        static int gameFieldWidth = width - 15;
+        static int gameFieldWidth = width - 40;
         static int gameFieldHeigth = heigth;
         static char[,] gameField = new char[gameFieldHeigth, gameFieldWidth];   // 25,80
         // life variables
@@ -42,42 +43,26 @@ namespace Main
         static int speedTimeCounter = 80;
 
 
-        static bool borCollision;
-        // left tree variables
-        static int leftTreeSpawnWidth;
-        static int leftTreeSpawnHeigth;
-        static bool spawnedLeftTree = false;
-        static int leftTreeCounter = -1;
-        static int leftTreeDespawnCounter = 3;
-        // middle tree variables
-        static int middleTreeSpawnWidth;
-        static int middleTreeSpawnHeigth;
-        static bool spawnedMiddleTree = false;
-        static int middleTreeCounter = -1;
-        static int middleTreeDespawnCounter = 3;
+        static bool treeCollision;
 
-        // right tree variables
 
         static string gameBeginning = System.IO.File.ReadAllText("../../../GameBeginningFile.txt");
         static string gameOver = System.IO.File.ReadAllText("../../../GameOverFile.txt");
-        static char[,] kiwi = new char[4,5] 
+        static char[,] kiwi = new char[4, 5] 
         {
             {'?', '\"', '?', '\"', '?'},
             {'\\', '(', '?', ')', '/'},
             {'?', '?', '@', '?', '?'},
             {'?', '?', '|', '?', '?'}
         };
-        static char[,] smallBor = new char[3, 4]
+        static char[,] bigDub = new char[4, 5]
         {
-            {'?', '/', '\\', '?'}, 
-            {'/', '?', '?', '\\'}, 
-            {'?', '|', '|', '?'}
+            {'?', '#', '#', '#', '?'},
+            {'#', '#', '#', '#', '#'},
+            {'#', '#', '#', '#', '#'},
+            {'?', '?', '$', '?', '?'},
+
         };
-        /*
-         * ?/\?
-         * /??\
-         * ?||?
-         */
 
         static char[,] bigBor = new char[4, 5]
         {
@@ -86,19 +71,46 @@ namespace Main
             {'^', '^', '^', '^', '^'},
             {'?', '?', '$', '?', '?'},
 
-        };         
-        /*             
-         *  ??/\??     ??^??
-         *  ?//\\?     ?^^^?
-         *  ///\\\     ^^^^^
-         *  ??||??     ??$??
-         */
+        };
+
+        static char[,] mediumBuk = new char[4, 5]
+        {
+            {'?', '#', '#', '#', '?'},
+            {'#', '#', '#', '#', '#'},
+            {'?', '#', '#', '#', '?'},
+            {'?', '?', '$', '?', '?'},
+        };
+
+        // left tree variables
+        static int leftTreeSpawnWidth;
+        static int leftTreeSpawnHeigth;
+        static bool spawnedLeftTree = false;
+        static int leftTreeCounter = -1;
+        static int leftTreeDespawnCounter = bigBor.GetLength(0) - 1;
+        // middle tree variables
+        static int middleTreeSpawnWidth;
+        static int middleTreeSpawnHeigth;
+        static bool spawnedMiddleTree = false;
+        static int middleTreeCounter = -1;
+        static int middleTreeDespawnCounter = bigDub.GetLength(0) - 1;
+
+        // right tree variables
+        static int rightTreeSpawnWidth;
+        static int rightTreeSpawnHeigth;
+        static bool spawnedRightTree = false;
+        static int rightTreeCounter = -1;
+        static int rightTreeDespawnCounter = mediumBuk.GetLength(0) - 1;
+
         static char[] lifeUp = new char[3] { '1', 'u', 'p' };
         static char[] speedDown = new char[4] { 'S', 'p', 'd', 'D' };
- 
+
         static void Main()
         {
-            int menuStartX = 85;
+            SoundPlayer player = new SoundPlayer();
+            player.SoundLocation = @"..\..\..\music\Final2.wav";
+            player.PlayLooping();
+
+            int menuStartX = 70;
             int menuStartY = 2;
             int travelled = 0;
             int currentSpeed = minSpeed;
@@ -108,7 +120,7 @@ namespace Main
             Console.CursorVisible = false;
             PrintMessages(0, 5, gameBeginning, ConsoleColor.Cyan);
             ConsoleKeyInfo key = Console.ReadKey(true);
-            
+
 
             while (true)
             {
@@ -126,7 +138,7 @@ namespace Main
                 {
                     currentSpeed++;
                 }
-                
+
                 // game field set up
                 FillGameField(gameField);
 
@@ -154,7 +166,7 @@ namespace Main
                     }
                     catch (IndexOutOfRangeException e)
                     {
-                        IndexOutOfRangeException(e); 
+                        IndexOutOfRangeException(e);
                     }
                 }
                 else if (chance >= 11 && chance <= 20 && spawnedSpeed == false)
@@ -183,7 +195,7 @@ namespace Main
                 }
                 else if (chance >= 21 && chance <= 40 && spawnedLeftTree == false)
                 {
-                    leftTreeSpawnWidth = randomNum.Next(1, (gameFieldWidth / 3)- bigBor.GetLength(1));
+                    leftTreeSpawnWidth = randomNum.Next(1, (gameFieldHeigth / 3) - bigBor.GetLength(1));
                     leftTreeSpawnHeigth = gameFieldHeigth - 1;
 
                     SpawnLeftTree(leftTreeSpawnWidth, leftTreeSpawnHeigth);
@@ -191,17 +203,20 @@ namespace Main
                 }
                 else if (chance >= 41 && chance <= 60 && spawnedMiddleTree == false)
                 {
-                    middleTreeSpawnWidth = randomNum.Next((gameFieldWidth / 3), (((gameFieldWidth * 2) / 3)) - bigBor.GetLength(1));
+                    middleTreeSpawnWidth = randomNum.Next((gameFieldHeigth / 3), gameFieldHeigth * 2 / 3 - bigBor.GetLength(1));
                     middleTreeSpawnHeigth = gameFieldHeigth - 1;
 
                     SpawnMiddleTree(middleTreeSpawnWidth, middleTreeSpawnHeigth);
                     spawnedMiddleTree = true;
                 }
-                //else if (chance >= 61 && chance <= 80 && spawnedRightTree == false)
-                //{
-                //    speedSpawnWidth = randomNum.Next(1, gameFieldWidth - 4);
-                //    speedSpawnHeight = randomNum.Next(3, gameFieldHeigth - 1);
-                //}
+                else if (chance >= 61 && chance <= 80 && spawnedRightTree == false)
+                {
+                    rightTreeSpawnWidth = randomNum.Next(gameFieldHeigth * 2 / 3, gameFieldHeigth - mediumBuk.GetLength(1));
+                    rightTreeSpawnHeigth = gameFieldHeigth - 1;
+
+                    SpawnRightTree(rightTreeSpawnWidth, rightTreeSpawnHeigth);
+                    spawnedRightTree = true;
+                }
 
                 // Checks if life is spawned, IF SO it keeps it there while the player takes is OR the counter ENDS
                 // if the counter reaches zero, on the next itteration the life will be GONE, and a new one can be spawned. When 1 life is spawned, another one CANNOT be spanwed.
@@ -264,7 +279,7 @@ namespace Main
                     else
                     {
                         SpawnLeftTree(leftTreeSpawnHeigth, leftTreeSpawnWidth);
-                    }                   
+                    }
                 }
                 if (spawnedMiddleTree)
                 {
@@ -280,8 +295,25 @@ namespace Main
                     else
                     {
                         SpawnMiddleTree(middleTreeSpawnHeigth, middleTreeSpawnWidth);
-                    }  
+                    }
                 }
+                if (spawnedRightTree)
+                {
+                    rightTreeSpawnHeigth--;
+                    if (rightTreeSpawnHeigth <= 2)
+                    {
+                        DespawnRightTree(rightTreeSpawnHeigth, rightTreeSpawnWidth);
+                        if (rightTreeCounter == 0)
+                        {
+                            spawnedRightTree = false;
+                        }
+                    }
+                    else
+                    {
+                        SpawnRightTree(rightTreeSpawnHeigth, rightTreeSpawnWidth);
+                    }
+                }
+
 
                 // Draw KIWI
                 SetKiwiPosition(gameField);
@@ -301,15 +333,15 @@ namespace Main
                     MoveKiwi(pressedKey);
                 }
 
-                // Check for collisions
+                // Check for collisions                
                 CollisionWithLifeUp(kiwiPositionX, kiwiPositionY);
                 CollisionWithSpeedDown(kiwiPositionX, kiwiPositionY);
-                CollisionWithBigBor(kiwiPositionX, kiwiPositionY);
-
-
+                CollisionWithTree(kiwiPositionX, kiwiPositionY,bigBor);
+                CollisionWithTree(kiwiPositionX, kiwiPositionY, bigDub);
+                CollisionWithTree(kiwiPositionX, kiwiPositionY,mediumBuk);
 
                 // Slow down game
-                Thread.Sleep(1); //(100- currentSpeed) >= 50 ? (200 - currentSpeed) : 150
+                Thread.Sleep((20- currentSpeed) >= 50 ? (200 - currentSpeed) : 150);
                 Console.Clear();
 
                 // Redraw the gameField after the clear(). Fixes movement tearing, BUT causes blue dot bug.
@@ -318,23 +350,21 @@ namespace Main
                 PrintStaticMenu(menuStartX, menuStartY);
                 PrintDynamicMenu(menuStartX, menuStartY, travelled, currentLives, currentPulse, currentSpeed);
 
-                if (borCollision == true)
+                if (treeCollision == true)
                 {
                     Console.Beep();
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    borCollision = false;
+                    treeCollision = false;
                     currentLives--;
                     travelled = 0;
                     kiwi[2, 2] = 'X';
-                    Thread.Sleep(1000);
-                    Console.BackgroundColor = ConsoleColor.White;
+                    Thread.Sleep(300);
                     kiwi[2, 2] = '@';
                     if (currentLives <= 0)
                     {
                         GameOver();
                     }
                 }
-                
+
             }
         }
 
@@ -416,14 +446,14 @@ namespace Main
             {
                 for (int col = 0, j = spawnHeigth; col < bigBor.GetLength(1); col++, j++)
                 {
-                        gameField[i, j] = bigBor[row, col];                  
+                    gameField[i, j] = bigBor[row, col];
                 }
             }
         }
 
         private static void SpawnMiddleTree(int spawnWidth, int spawnHeigth)
         {
-            if (middleTreeCounter < bigBor.GetLength(0))
+            if (middleTreeCounter < bigDub.GetLength(0))
             {
                 middleTreeCounter++;
             }
@@ -431,31 +461,43 @@ namespace Main
             {
                 for (int col = 0, j = spawnHeigth; col < bigBor.GetLength(1); col++, j++)
                 {
-                    gameField[i, j] = bigBor[row, col];
+                    gameField[i, j] = bigDub[row, col];
                 }
             }
         }
-        // Despawn
 
-        private static void DeleteTree(int spawnWidth, int spawnHeigth)
+        private static void SpawnRightTree(int spawnWidth, int spawnHeigth)
         {
-
+            if (rightTreeCounter < mediumBuk.GetLength(0))
+            {
+                rightTreeCounter++;
+            }
+            for (int row = 0, i = spawnWidth; row < rightTreeCounter; row++, i++)
+            {
+                for (int col = 0, j = spawnHeigth; col < mediumBuk.GetLength(1); col++, j++)
+                {
+                    gameField[i, j] = mediumBuk[row, col];
+                }
+            }
         }
-        
+
+
+        // Despawn   
+
         private static void DespawnLeftTree(int spawnWidth, int spawnHeigth)
         {
             if (leftTreeCounter > 0)
             {
                 leftTreeCounter--;
             }
-            leftTreeDespawnCounter = 3;
+            leftTreeDespawnCounter = bigBor.GetLength(0) - 1;
             leftTreeDespawnCounter = (leftTreeDespawnCounter - leftTreeCounter) + 1;
 
             for (int row = leftTreeCounter, i = spawnWidth; row > 0; row--, i++)
             {
                 for (int col = 0, j = spawnHeigth; col < bigBor.GetLength(1); col++, j++)
                 {
-                    gameField[i, j] = bigBor[leftTreeDespawnCounter, col];                  
+                    gameField[i, j] = bigBor[leftTreeDespawnCounter, col];
                 }
                 leftTreeDespawnCounter++;
             }
@@ -467,16 +509,35 @@ namespace Main
             {
                 middleTreeCounter--;
             }
-            middleTreeDespawnCounter = 3;
+            middleTreeDespawnCounter = bigDub.GetLength(0) - 1;
             middleTreeDespawnCounter = (middleTreeDespawnCounter - middleTreeCounter) + 1;
 
             for (int row = middleTreeCounter, i = spawnWidth; row > 0; row--, i++)
             {
-                for (int col = 0, j = spawnHeigth; col < bigBor.GetLength(1); col++, j++)
+                for (int col = 0, j = spawnHeigth; col < bigDub.GetLength(1); col++, j++)
                 {
-                    gameField[i, j] = bigBor[middleTreeDespawnCounter, col];
+                    gameField[i, j] = bigDub[middleTreeDespawnCounter, col];
                 }
                 middleTreeDespawnCounter++;
+            }
+        }
+
+        private static void DespawnRightTree(int spawnWidth, int spawnHeigth)
+        {
+            if (rightTreeCounter > 0)
+            {
+                rightTreeCounter--;
+            }
+            rightTreeDespawnCounter = mediumBuk.GetLength(0) - 1;
+            rightTreeDespawnCounter = (rightTreeDespawnCounter - rightTreeCounter) + 1;
+
+            for (int row = rightTreeCounter, i = spawnWidth; row > 0; row--, i++)
+            {
+                for (int col = 0, j = spawnHeigth; col < mediumBuk.GetLength(1); col++, j++)
+                {
+                    gameField[i, j] = mediumBuk[rightTreeDespawnCounter, col];
+                }
+                rightTreeDespawnCounter++;
             }
         }
         // Filling game field
@@ -500,10 +561,10 @@ namespace Main
             {
                 for (int col = 0; col < gameField.GetLength(1); col++)
                 {
-                    SetColors(row, col);
+                    //SetColors(row, col);
                     if (gameField[row, col] == '?' || gameField[row, col] == '0')
                     {
-                        
+
                     }
                     else
                     {
@@ -513,13 +574,13 @@ namespace Main
                     if (col == gameField.GetLength(1) - 1)
                     {
                         Console.SetCursorPosition(col, row);
-                        Console.Out.Write(gameField[row, col] = '|');
+                        Console.Write(gameField[row, col] = '|');
                     }
                 }
             }
         }
         private static void PrintDynamicMenu(int positionX, int positionY, int travelled, int currentLives, int currentPulse, int currentSpeed)
-        {            
+        {
             if (currentLives == 1)
             {
                 PrintMessages(positionX + 2, positionY + 4, currentLives.ToString(), ConsoleColor.Red);
@@ -532,7 +593,7 @@ namespace Main
             {
                 PrintMessages(positionX + 2, positionY + 4, currentLives.ToString(), ConsoleColor.Green);
             }
-            
+
             if (currentSpeed < maxSpeed)
             {
                 PrintMessages(positionX + 2, positionY + 10, currentSpeed.ToString(), ConsoleColor.Cyan);
@@ -540,14 +601,14 @@ namespace Main
             else
             {
                 PrintMessages(positionX + 2, positionY + 10, currentSpeed.ToString(), ConsoleColor.Red);
-            }            
-            PrintMessages(positionX + 2, positionY + 16, currentPulse.ToString(), ConsoleColor.Red);           
+            }
+            PrintMessages(positionX + 2, positionY + 16, currentPulse.ToString(), ConsoleColor.Red);
             PrintMessages(positionX + 2, positionY + 22, travelled.ToString(), ConsoleColor.Cyan);
         }
 
         private static void PrintStaticMenu(int positionX, int positionY)
         {
-            PrintMessages(positionX, positionY + 2, "Lives:", ConsoleColor.White);
+            PrintMessages(positionX, positionY + 2, "Lives: ", ConsoleColor.White);
             PrintMessages(positionX + 2, positionY + 3, "Curr /", ConsoleColor.DarkGray);
             PrintMessages(positionX + 9, positionY + 3, "Max", ConsoleColor.DarkGray);
             PrintMessages(positionX + 7, positionY + 4, "/", ConsoleColor.DarkGray);
@@ -570,7 +631,7 @@ namespace Main
             Console.ForegroundColor = color;
             Console.WriteLine(text);
         }
-        
+
         // Collision checks below
         private static void CollisionWithLifeUp(int currentRow, int currenCol)
         {
@@ -606,19 +667,19 @@ namespace Main
             }
         }
 
-        private static void CollisionWithBigBor(int currentRow, int currentCol)
+        private static void CollisionWithTree(int currentRow, int currentCol,char[,] tree)
         {
             for (int row = currentRow, i = 0; i < kiwi.GetLength(0); row++, i++)
             {
                 for (int col = currentCol, j = 0; j < kiwi.GetLength(1); col++, j++)
                 {
-                    for (int borRow = 0; borRow < bigBor.GetLength(0); borRow++)
+                    for (int treeRow = 0; treeRow < tree.GetLength(0); treeRow++)
                     {
-                        for (int borCol = 0; borCol < bigBor.GetLength(1); borCol++)
+                        for (int treeCol = 0; treeCol < tree.GetLength(1); treeCol++)
                         {
-                            if ((gameField[row+1, col] == bigBor[borRow, borCol]) && (bigBor[borRow, borCol] != '?'))
+                            if ((gameField[row + 1, col] == tree[treeRow, treeCol]) && (tree[treeRow, treeCol] != '?'))
                             {
-                                borCollision = true;
+                                treeCollision = true;
                             }
                         }
                     }
@@ -641,12 +702,12 @@ namespace Main
 
         static void SetColors(int row, int col)
         {
-            if ( gameField[row, col] == '\\' || gameField[row, col] == '/' || gameField[row, col] == '(' || gameField[row, col] == ')' || gameField[row, col] == '(' || gameField[row, col] == '@')
+            if (gameField[row, col] == '\\' || gameField[row, col] == '/' || gameField[row, col] == '(' || gameField[row, col] == ')' || gameField[row, col] == '(' || gameField[row, col] == '@')
             {
                 Console.ForegroundColor = ConsoleColor.Magenta;
             }
-            
-             if (gameField[row, col] == '"')
+
+            if (gameField[row, col] == '"')
             {
                 Console.ForegroundColor = ConsoleColor.DarkRed;
             }
@@ -674,12 +735,15 @@ namespace Main
             }
         }
 
-        public static void Pause()
+        static void Pause()
         {
             Console.WriteLine("The game is paused ");
             System.Diagnostics.Process pauseProc =
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
-                { FileName = "cmd", Arguments = "/C pause", UseShellExecute = false 
+                {
+                    FileName = "cmd",
+                    Arguments = "/C pause",
+                    UseShellExecute = false
                 });
             pauseProc.WaitForExit();
 
