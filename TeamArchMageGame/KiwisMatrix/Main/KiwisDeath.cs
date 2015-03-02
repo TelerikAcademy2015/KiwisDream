@@ -571,22 +571,62 @@ namespace KiwiGame
 
         private static void PrintStaticMenu(int positionX, int positionY)
         {
+            PrintMessages(positionX - 4, positionY + 1, "╔══════════════════════╗", ConsoleColor.White);
+            PrintMessages(positionX - 4, positionY + 2, "║", ConsoleColor.White);
+            PrintMessages(positionX + 19, positionY + 2, "║", ConsoleColor.White);
             PrintMessages(positionX, positionY + 2, "Lives: ", ConsoleColor.White);
-            PrintMessages(positionX + 2, positionY + 3, "Curr /", ConsoleColor.DarkGray);
+            PrintMessages(positionX - 4, positionY + 3, "║", ConsoleColor.White);
+            PrintMessages(positionX + 19, positionY + 3, "║", ConsoleColor.White);
+            PrintMessages(positionX + 2, positionY + 3, "Curr |", ConsoleColor.DarkGray);
             PrintMessages(positionX + 9, positionY + 3, "Max", ConsoleColor.DarkGray);
-            PrintMessages(positionX + 7, positionY + 4, "/", ConsoleColor.DarkGray);
+            PrintMessages(positionX + 7, positionY + 4, "|", ConsoleColor.DarkGray);
+            PrintMessages(positionX - 4, positionY + 4, "║", ConsoleColor.White);
+            PrintMessages(positionX + 19, positionY + 4, "║", ConsoleColor.White);
             PrintMessages(positionX + 9, positionY + 4, maxLives.ToString(), ConsoleColor.Gray);
+            PrintMessages(positionX - 4, positionY + 5, "╚══════════════════════╝", ConsoleColor.White);
+
+
+            PrintMessages(positionX - 4, positionY + 7, "╔══════════════════════╗", ConsoleColor.White);
             PrintMessages(positionX, positionY + 8, "Speed:", ConsoleColor.White);
+            PrintMessages(positionX - 4, positionY + 8, "║", ConsoleColor.White);
+            PrintMessages(positionX + 19, positionY + 8, "║", ConsoleColor.White);
             PrintMessages(positionX + 2, positionY + 9, "Curr /", ConsoleColor.DarkGray);
             PrintMessages(positionX + 9, positionY + 9, "Max", ConsoleColor.DarkGray);
+            PrintMessages(positionX - 4, positionY + 9, "║", ConsoleColor.White);
+            PrintMessages(positionX + 19, positionY + 9, "║", ConsoleColor.White);
             PrintMessages(positionX + 7, positionY + 10, "/", ConsoleColor.DarkGray);
             PrintMessages(positionX + 9, positionY + 10, maxSpeed.ToString(), ConsoleColor.Gray);
+            PrintMessages(positionX - 4, positionY + 10, "║", ConsoleColor.White);
+            PrintMessages(positionX + 19, positionY + 10, "║", ConsoleColor.White);
+            PrintMessages(positionX - 4, positionY + 11, "║", ConsoleColor.White);
+            PrintMessages(positionX + 19, positionY + 11, "║", ConsoleColor.White);
+            PrintMessages(positionX - 4, positionY + 11, "╚══════════════════════╝", ConsoleColor.White);
+
+
+            PrintMessages(positionX - 4, positionY + 13, "╔══════════════════════╗", ConsoleColor.White);
+            PrintMessages(positionX - 4, positionY + 14, "║", ConsoleColor.White);
+            PrintMessages(positionX + 19, positionY + 14, "║", ConsoleColor.White);
             PrintMessages(positionX, positionY + 14, "Pulse:", ConsoleColor.White);
             PrintMessages(positionX + 2, positionY + 15, "Curr /", ConsoleColor.DarkGray);
             PrintMessages(positionX + 9, positionY + 15, "Max", ConsoleColor.DarkGray);
+            PrintMessages(positionX - 4, positionY + 15, "║", ConsoleColor.White);
+            PrintMessages(positionX + 19, positionY + 15, "║", ConsoleColor.White);
             PrintMessages(positionX + 7, positionY + 16, "/", ConsoleColor.DarkGray);
             PrintMessages(positionX + 9, positionY + 16, maxPulse.ToString(), ConsoleColor.Gray);
+            PrintMessages(positionX - 4, positionY + 16, "║", ConsoleColor.White);
+            PrintMessages(positionX + 19, positionY + 16, "║", ConsoleColor.White);
+            PrintMessages(positionX - 4, positionY + 17, "╚══════════════════════╝", ConsoleColor.White);
+
+
+            PrintMessages(positionX - 4, positionY + 19, "╔══════════════════════╗", ConsoleColor.White);
+            PrintMessages(positionX - 4, positionY + 20, "║", ConsoleColor.White);
+            PrintMessages(positionX + 19, positionY + 20, "║", ConsoleColor.White);
             PrintMessages(positionX, positionY + 20, "Travelled:", ConsoleColor.White);
+            PrintMessages(positionX - 4, positionY + 21, "║", ConsoleColor.White);
+            PrintMessages(positionX + 19, positionY + 21, "║", ConsoleColor.White);
+            PrintMessages(positionX - 4, positionY + 22, "║", ConsoleColor.White);
+            PrintMessages(positionX + 19, positionY + 22, "║", ConsoleColor.White);
+            PrintMessages(positionX - 4, positionY + 23, "╚══════════════════════╝", ConsoleColor.White);
         }
         static void PrintMessages(int x, int y, string text, ConsoleColor color)
         {
