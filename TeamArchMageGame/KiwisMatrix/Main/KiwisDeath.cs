@@ -233,87 +233,21 @@ namespace KiwiGame
                         SpawnSpeedDown(speedSpawnWidth, speedSpawnHeight); // Keep spawning the speed at the same place
                     }
                 }
-                if (leftTree.SpawnedTree)
-                {
-                    leftTree.SpawnHeigth--;
-                    if (leftTree.SpawnHeigth <= 2)
-                    {
-                        DespawnTree(leftTree);
-                        if (leftTree.Counter == 0)
-                        {
-                            leftTree.SpawnedTree = false;
-                        }
-                    }
-                    else
-                    {
-                        SpawnTree(leftTree);
-                    }
-                }
-                if (middleTree.SpawnedTree)
-                {
-                    middleTree.SpawnHeigth--;
-                    if (middleTree.SpawnHeigth <= 2)
-                    {
-                        DespawnTree(middleTree);
-                        if (middleTree.Counter == 0)
-                        {
-                            middleTree.SpawnedTree = false;
-                        }
-                    }
-                    else
-                    {
-                        SpawnTree(middleTree);
-                    }
-                }
-                if (rightTree.SpawnedTree)
-                {
-                    rightTree.SpawnHeigth--;
-                    if (rightTree.SpawnHeigth <= 2)
-                    {
-                        DespawnTree(rightTree);
-                        if (rightTree.Counter == 0)
-                        {
-                            rightTree.SpawnedTree = false;
-                        }
-                    }
-                    else
-                    {
-                        SpawnTree(rightTree);
-                    }
-                }
-                if (lastTree.SpawnedTree)
-                {
-                    lastTree.SpawnHeigth--;
-                    if (lastTree.SpawnHeigth <= 2)
-                    {
-                        DespawnTree(lastTree);
-                        if (lastTree.Counter == 0)
-                        {
-                            lastTree.SpawnedTree = false;
-                        }
-                    }
-                    else
-                    {
-                        SpawnTree(lastTree);
-                    }
-                }
-                if (lastLastTree.SpawnedTree)
-                {
-                    lastLastTree.SpawnHeigth--;
-                    if (lastLastTree.SpawnHeigth <= 2)
-                    {
-                        DespawnTree(lastLastTree);
-                        if (lastLastTree.Counter == 0)
-                        {
-                            lastLastTree.SpawnedTree = false;
-                        }
-                    }
-                    else
-                    {
-                        SpawnTree(lastLastTree);
-                    }
-                }
 
+                MoveTree(leftTree);
+                MoveTree(middleTree);
+                MoveTree(rightTree);
+                MoveTree(lastTree);
+                MoveTree(lastLastTree);
+
+                // Check for collisions 
+                CollisionWithLifeUp(kiwiPositionX, kiwiPositionY);
+                CollisionWithSpeedDown(kiwiPositionX, kiwiPositionY);
+                CheckCollisionWithTree(kiwiPositionX, kiwiPositionY, leftTree);
+                CheckCollisionWithTree(kiwiPositionX, kiwiPositionY, middleTree);
+                CheckCollisionWithTree(kiwiPositionX, kiwiPositionY, rightTree);
+                CheckCollisionWithTree(kiwiPositionX, kiwiPositionY, lastTree);
+                CheckCollisionWithTree(kiwiPositionX, kiwiPositionY, lastLastTree);
 
                 // Draw KIWI
                 SetKiwiPosition(gameField);
@@ -332,16 +266,6 @@ namespace KiwiGame
                     MoveKiwi(pressedKey);
                 }
 
-                // Check for collisions                
-                CollisionWithLifeUp(kiwiPositionX, kiwiPositionY);
-                CollisionWithSpeedDown(kiwiPositionX, kiwiPositionY);
-                CollisionWithTree(kiwiPositionX, kiwiPositionY, leftTree);
-                CollisionWithTree(kiwiPositionX, kiwiPositionY, middleTree);
-                CollisionWithTree(kiwiPositionX, kiwiPositionY, rightTree);
-                CollisionWithTree(kiwiPositionX, kiwiPositionY, lastTree);
-                CollisionWithTree(kiwiPositionX, kiwiPositionY, lastLastTree);
-
-
                 // Slow down game
                 Thread.Sleep((20 - currentSpeed) >= 50 ? (200 - currentSpeed) : 150);
                 Console.Clear();
@@ -355,38 +279,23 @@ namespace KiwiGame
                 {
                     if (leftTree.IsHitted)
                     {
-                        leftTree.SpawnedTree = false;
-                        leftTree.Counter = -1;
-                        leftTree.DespawnCounter = leftTree.TypeOfTree.GetLength(0) - 1;
-                        leftTree.IsHitted = false;
+                        DeleteTree(leftTree);
                     }
                     if (middleTree.IsHitted)
                     {
-                        middleTree.SpawnedTree = false;
-                        middleTree.Counter = -1;
-                        middleTree.DespawnCounter = middleTree.TypeOfTree.GetLength(0) - 1;
-                        middleTree.IsHitted = false;
+                        DeleteTree(middleTree);
                     }
                     if (rightTree.IsHitted)
                     {
-                        rightTree.SpawnedTree = false;
-                        rightTree.Counter = -1;
-                        rightTree.DespawnCounter = rightTree.TypeOfTree.GetLength(0) - 1;
-                        rightTree.IsHitted = false;
+                        DeleteTree(rightTree);
                     }
                     if (lastTree.IsHitted)
                     {
-                        lastTree.SpawnedTree = false;
-                        lastTree.Counter = -1;
-                        lastTree.DespawnCounter = lastTree.TypeOfTree.GetLength(0) - 1;
-                        lastTree.IsHitted = false;
+                        DeleteTree(lastTree);
                     }
                     if (lastLastTree.IsHitted)
                     {
-                        lastLastTree.SpawnedTree = false;
-                        lastLastTree.Counter = -1;
-                        lastLastTree.DespawnCounter = lastLastTree.TypeOfTree.GetLength(0) - 1;
-                        lastLastTree.IsHitted = false;
+                        DeleteTree(lastLastTree);
                     }
 
                     Console.Beep();
@@ -485,6 +394,26 @@ namespace KiwiGame
             }
         }
 
+        public static void MoveTree(Tree tree)
+        {
+            if (tree.SpawnedTree)
+            {
+                tree.SpawnHeigth--;
+                if (tree.SpawnHeigth <= 2)
+                {
+                    DespawnTree(tree);
+                    if (tree.Counter == 0)
+                    {
+                        tree.SpawnedTree = false;
+                    }
+                }
+                else
+                {
+                    SpawnTree(tree);
+                }
+            }
+        }
+
         private static void DespawnTree(Tree tree)
         {
             if (tree.Counter > 0)
@@ -503,6 +432,15 @@ namespace KiwiGame
                 tree.DespawnCounter++;
             }
         }
+
+        private static void DeleteTree(Tree tree)
+        {
+                tree.SpawnedTree = false;
+                tree.Counter = -1;
+                tree.DespawnCounter = tree.TypeOfTree.GetLength(0) - 1;
+                tree.IsHitted = false;
+        }
+        
         // Filling game field
         private static void FillGameField(char[,] gameField)
         {
@@ -670,7 +608,7 @@ namespace KiwiGame
             }
         }
 
-        private static void CollisionWithTree(int currentRow, int currentCol, Tree tree)
+        private static void CheckCollisionWithTree(int currentRow, int currentCol, Tree tree)
         {
             for (int row = currentRow, i = 0; i < kiwi.GetLength(0); row++, i++)
             {
@@ -684,7 +622,6 @@ namespace KiwiGame
                             {
                                 treeCollision = true;
                                 tree.IsHitted = true;
-                                return;
                             }
                         }
                     }
