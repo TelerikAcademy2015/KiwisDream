@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Main", "Main\Main.csproj", "{4CF9C812-16B9-4B6A-A281-6CB257501E50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KiwiGame", "Main\KiwiGame.csproj", "{4CF9C812-16B9-4B6A-A281-6CB257501E50}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E3A5EE6E-5188-4B5D-AE73-F50392D8B8C8}"
 	ProjectSection(SolutionItems) = preProject
